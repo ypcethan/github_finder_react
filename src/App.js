@@ -13,10 +13,17 @@ import "./App.css";
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { users: [], isLoading: true, alert: null, user: {} };
+    this.state = {
+      users: [],
+      isLoading: true,
+      alert: null,
+      user: {},
+      repos: []
+    };
     this.searchUsers = this.searchUsers.bind(this);
     this.clearUsers = this.clearUsers.bind(this);
     this.getUser = this.getUser.bind(this);
+    this.getUserRepos = this.getUserRepos.bind(this);
   }
 
   async searchUsers(text) {
@@ -39,6 +46,18 @@ class App extends Component {
 
     this.setState({ user: res.data, isLoading: false });
   }
+
+  //Get user repo
+  async getUserRepos(username) {
+    this.setState({ isLoading: true });
+    const res = await axios.get(
+      `https://api.github.com/users/${username}/repos?per_page=5&sort=created:asc&client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRECT}`
+    );
+    console.log("Get user called");
+
+    this.setState({ repos: res.data, isLoading: false });
+  }
+
   clearUsers() {
     this.setState({ users: [], isLoading: false });
   }
@@ -98,6 +117,8 @@ class App extends Component {
                     getUser={this.getUser}
                     user={this.state.user}
                     loading={this.state.isLoading}
+                    getUserRepos={this.getUserRepos}
+                    repos={this.state.repos}
                   />
                 )}
               />
